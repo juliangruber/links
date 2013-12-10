@@ -35,7 +35,7 @@ module.exports = function(opts) {
    */
   
   function* show(id) {
-    var content;
+    var content = '';
     if (id) content = yield db.get('content:' + id);
     this.body = yield render(__dirname + '/index.jade', {
       id: id,
