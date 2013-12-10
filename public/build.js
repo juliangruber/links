@@ -1420,7 +1420,6 @@ textarea.oninput = function() {
     id = res.body.id;
 
     history.pushState({}, '', '/' + id);
-    document.title = id;
     textarea.oninput = save;
     save();
   });
@@ -1432,6 +1431,7 @@ textarea.oninput = function() {
 
 var save = debounce(function() {
   if (!textarea.value) return;
+  document.title = textarea.value.split('\n')[0];
   
   request
   .put(location.pathname)
