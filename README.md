@@ -1,10 +1,10 @@
 
 # links
 
-A minimal webapp to share content through links.
+Experimental content sharing and collaboration platform.
 
-* without any UI
-* without login
+* Anonymous
+* No UI
 
 ## Screenshots
 
