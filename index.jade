@@ -25,6 +25,20 @@ html
       textarea:focus {
         outline: none;
       }
+      #footer {
+        position: absolute;
+        right: 10px;
+        bottom: 5px;
+        font-family: sans-serif;
+        font-size: 50%;
+      }
+      #footer, #footer a {
+        color: gray;
+        text-decoration: none;
+      }
+      #footer a {
+        font-weight: bold;
+      }
   body
     - var placeholder = 'Start writing and you get a link.\n\n'
     textarea(
@@ -33,7 +47,8 @@ html
       placeholder='Start writing and you get a link. '
         + 'Share your writing by sending the link to someone, '
         + 'who gets their own link as soon as they start editing themselves.'
-      )!= content      
+      )!= content
+    if footer
+      #footer!= footer
     script(src='/build.js')
-    script.
-      require('links');
+    script require('links');
