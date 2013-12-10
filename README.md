@@ -12,6 +12,10 @@ Experimental content sharing and collaboration platform.
 
 ![text](screenshots/text.png)
 
+```bash
+$ links --footer="by <a href=http://juliangruber.com/>Julian Gruber</a>"
+```
+
 ## How it works
 
 You start writing and get a public link. You send that link to someone and they see your content. As soon as they start editing themselves they get their own link which they can share again.
