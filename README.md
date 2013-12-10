@@ -41,6 +41,7 @@ $ links --port=8000
 
 ## TODO
 
+* setup public instance
 * add saving indicator
 * evaluate storage mechanisms for the token
 
