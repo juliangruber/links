@@ -1,0 +1,45 @@
+{
+  "name": "links",
+  "description": "Experimental anonymous content sharing and collaboration platform.",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/juliangruber/links.git"
+  },
+  "homepage": "https://github.com/juliangruber/links",
+  "main": "index.js",
+  "bin": {
+    "links": "bin/links.js"
+  },
+  "dependencies": {
+    "koa": "0.0.2",
+    "koa-static": "~1.2.0",
+    "koa-route": "~1.0.2",
+    "level-co": "~0.2.0",
+    "leveldown": "~0.10.2",
+    "co-render": "0.0.1",
+    "koa-logger": "~1.0.1",
+    "jade": "~0.35.0",
+    "uid2": "0.0.3",
+    "co-body": "0.0.1",
+    "minimist": "0.0.5"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "links",
+    "urls",
+    "cas",
+    "anonymous",
+    "sharing",
+    "app",
+    "platform",
+    "collab",
+    "collaboration"
+  ],
+  "author": {
+    "name": "Julian Gruber",
+    "email": "mail@juliangruber.com",
+    "url": "http://juliangruber.com"
+  },
+  "license": "MIT"
+}

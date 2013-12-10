@@ -1,0 +1,39 @@
+!!! 5
+html
+  head
+    title= id || 'empty'
+    style(type='text/css').
+      html {
+        height: 100%;
+      }
+      body {
+        height: 100%;
+        margin: 0;
+        text-align: center;
+        overflow: hidden;
+      }
+      textarea {
+        height: 100%;
+        border: 0;
+        padding: 0;
+        padding: 31px 24px;
+        font-family: Serif;
+        font-size: 115%;
+        resize: none;
+        box-sizing: border-box;
+      }
+      textarea:focus {
+        outline: none;
+      }
+  body
+    - var placeholder = 'Start writing and you get a link.\n\n'
+    textarea(
+      cols=60,
+      autofocus,
+      placeholder='Start writing and you get a link. '
+        + 'Share your writing by sending the link to someone, '
+        + 'who gets their own link as soon as they start editing themselves.'
+      )!= content      
+    script(src='/build.js')
+    script.
+      require('links');

@@ -1,0 +1,9 @@
+{
+  "name": "links",
+  "dependencies": {
+    "component/debounce": "*",
+    "visionmedia/superagent": "*"
+  },
+  "scripts": ["browser.js"],
+  "main": "browser.js"
+}
