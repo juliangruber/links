@@ -1403,24 +1403,6 @@ var request = require('superagent');
 var textarea = document.querySelector('textarea');
 var id = location.pathname.split('/')[2];
 var token;
-var saving = false;
-var again = false;
-
-/**
- * Save the content.
- */
-
-var save = debounce(function() {
-  if (!textarea.value) return;
-  
-  request
-  .put(location.pathname)
-  .send({ token: token })
-  .send({ content: textarea.value })
-  .end(function(err, res) {
-    if (err || !res.ok) alert(err || res.text);
-  });
-}, 500);
 
 /**
  * On initial edit, fork.
@@ -1443,6 +1425,22 @@ textarea.oninput = function() {
     save();
   });
 };
+
+/**
+ * Save the content.
+ */
+
+var save = debounce(function() {
+  if (!textarea.value) return;
+  
+  request
+  .put(location.pathname)
+  .send({ token: token })
+  .send({ content: textarea.value })
+  .end(function(err, res) {
+    if (err || !res.ok) alert(err || res.text);
+  });
+}, 500);
 
 /**
  * On pop state, reload.

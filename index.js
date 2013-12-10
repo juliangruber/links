@@ -15,7 +15,7 @@ var db = level('db', { db: leveldown });
 var app = module.exports = koa();
 
 app.use(logger());
-app.use(serve(__dirname + '/build'));
+app.use(serve(__dirname + '/public'));
 
 app.use(get(/^\/([A-z0-9]{32})?$/, show));
 app.use(put(/^\/([A-z0-9]{32})?$/, update));
