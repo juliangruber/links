@@ -27,7 +27,7 @@ For production:
 ```bash
 $ sudo npm install -g links
 $ cd dir/to/put/the/db/in
-$ links --port=8000
+$ links
 ```
 
 For development:
@@ -36,8 +36,13 @@ For development:
 $ git clone git@github.com:juliangruber/links.git && cd links
 $ npm install
 $ sudo npm link
-$ links --port=8000
+$ links
 ```
+
+## CLI
+
+* `--port, -p` The port to run on
+* `--footer` Footer html to display
 
 ## TODO
 
