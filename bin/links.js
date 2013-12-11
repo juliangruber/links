@@ -1,4 +1,4 @@
-#!/usr/bin/env node --harmony-generators
+#!/usr/bin/env node
 
 var Links = require('..');
 var minimist = require('minimist');

@@ -1,15 +1,6 @@
-var koa = require('koa');
-var serve = require('koa-static');
-var route = require('koa-route');
-var get = route.get;
-var post = route.post;
-var put = route.put;
-var level = require('level-co').deferred;
-var leveldown = require('leveldown');
-var render = require('co-render');
-var logger = require('koa-logger');
+var express = require('express');
+var level = require('level');
 var uid = require('uid2');
-var parse = require('co-body');
 
 /**
  * Create a new links app.
@@ -20,26 +11,40 @@ var parse = require('co-body');
 
 module.exports = function(opts) {
   if (!opts) opts = {};
-  var db = level('db', { db: leveldown });
-  var app = koa();
+  var db = level('db');
+  var app = express();
   
-  app.use(logger());
-  app.use(serve(__dirname + '/public'));
+  app.set('view engine', 'jade');
+  app.set('views', __dirname);
   
-  app.use(get(/^\/([A-z0-9]{32})?$/, show));
-  app.use(put(/^\/([A-z0-9]{32})?$/, update));
-  app.use(post('/fork', fork));
+  app.use(express.logger('dev'));
+  app.use(express.static(__dirname + '/public'));
+  
+  app.get(/^\/([A-z0-9]{32})?$/, load, show);
+  app.put(/^\/([A-z0-9]{32})?$/, express.json(), update);
+  app.post('/fork', fork);
+  
+  /**
+   * Load content.
+   */
+  
+  function load(req, res, next) {
+    var id = req.params[0];
+    if (!id) return next();
+    db.get('content:' + id, function(err, content) {
+      req.content = content;
+      next(err);
+    });
+  }
   
   /**
    * Show content.
    */
   
-  function* show(id) {
-    var content = '';
-    if (id) content = yield db.get('content:' + id);
-    this.body = yield render(__dirname + '/index.jade', {
-      id: id,
-      content: content,
+  function show(req, res) {
+    res.render('index', {
+      id: req.params[0],
+      content: req.content || '',
       footer: opts.footer
     });
   }
@@ -48,26 +53,33 @@ module.exports = function(opts) {
    * Fork content and generate a token.
    */
   
-  function* fork() {
+  function fork(req, res, next) {
     var token = uid(32);
     var forkId = uid(32);
-    yield db.put('token:' + forkId, token);
-    this.body = {
-      token: token,
-      id: forkId
-    };
+    db.put('token:' + forkId, token, function(err) {
+      if (err) return next(err);
+      res.send({
+        token: token,
+        id: forkId
+      });
+    });
   }
   
   /**
    * Update content if tokens match.
    */
   
-  function* update(id) {
-    var body = yield parse.json(this);
-    var token = yield db.get('token:' + id);
-    if (token != body.token) return this.throw(403);
-    yield db.put('content:' + id, body.content);
-    this.body = 'ok';
+  function update(req, res, next) {
+    var id = req.params[0];
+    db.get('token:' + id, function(err, token) {
+      if (err) return next(err);
+      
+      if (token != req.body.token) return res.status(403).end('forbidden');
+      db.put('content:' + id, req.body.content, function(err) {
+        if (err) return next(err);
+        res.send('ok');
+      });
+    });
   }
 
   return app;
