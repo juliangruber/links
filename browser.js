@@ -4,28 +4,41 @@ var request = require('superagent');
 var textarea = document.querySelector('textarea');
 var id = location.pathname.split('/')[2];
 var token;
+var queue = {};
 
 /**
- * On initial edit, fork.
+ * On first edit, fork.
  */
 
 textarea.oninput = function() {
   textarea.oninput = null;
-  showIndicator();
+  fork();
+};
 
+/**
+ * Fork the content.
+ */
+
+function fork() {
+  showIndicator();
+  
   request
   .post('/fork')
   .end(function(err, res) {
-    if (err && !err.crossDomain || res && !res.ok) alert(err || res.text);
+    if (err) {
+      qeue.fork = true;
+      hideIndicator();
+      return;
+    }
 
     token = res.body.token;
     id = res.body.id;
-
+  
     history.pushState({}, '', '/' + id);
     textarea.oninput = save;
     save();
   });
-};
+}
 
 /**
  * Save the content.
@@ -45,7 +58,7 @@ var _save = debounce(function(done) {
   .send({ token: token })
   .send({ content: textarea.value })
   .end(function(err, res) {
-    if (err && !err.crossDomain || res && !res.ok) alert(err || res.text);
+    if (err) queue.save = true;
     hideIndicator();
     done();
   });
@@ -76,7 +89,13 @@ window.onpopstate = function(e) {
 };
 
 /**
- * On reconnect, submit current content.
+ * On reconnect, call queued functions.
  */
 
-window.ononline = save;
+function connect() {
+  if (queue.fork) fork();
+  else if (queue.save) save();
+  queue = {};
+}
+
+window.ononline = connect;
