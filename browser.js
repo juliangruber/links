@@ -27,7 +27,6 @@ function fork() {
   .end(function(err, res) {
     if (err) {
       queue.fork = true;
-      hideIndicator();
       offline();
       return;
     }
@@ -62,8 +61,9 @@ var _save = debounce(function(done) {
     if (err) {
       queue.save = true;
       offline();
+    } else {
+      hideIndicator();
     }
-    hideIndicator();
     done();
   });
 }, 500);
