@@ -16,7 +16,7 @@ textarea.oninput = function() {
   request
   .post('/fork')
   .end(function(err, res) {
-    if (err || !res.ok) return alert(err || res.text);
+    if (err && !err.crossDomain || res && !res.ok) alert(err || res.text);
 
     token = res.body.token;
     id = res.body.id;
@@ -45,7 +45,7 @@ var _save = debounce(function(done) {
   .send({ token: token })
   .send({ content: textarea.value })
   .end(function(err, res) {
-    if (err || !res.ok) alert(err || res.text);
+    if (err && !err.crossDomain || res && !res.ok) alert(err || res.text);
     hideIndicator();
     done();
   });
