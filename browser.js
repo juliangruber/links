@@ -74,3 +74,9 @@ function hideIndicator() {
 window.onpopstate = function(e) {
   if (e.state) location = location;  
 };
+
+/**
+ * On reconnect, submit current content.
+ */
+
+window.ononline = save;
