@@ -2,6 +2,11 @@
 html
   head
     title= content.split('\n')[0]
+    meta(name='viewport', content=[
+      'width=device-width',
+      'initial-scale=1',
+      'maximum-scale=1'
+    ].join(', '))
     style(type='text/css').
       html {
         height: 100%;
@@ -21,6 +26,7 @@ html
         font-size: 115%;
         resize: none;
         box-sizing: border-box;
+        max-width: 100%;
       }
       textarea:focus {
         outline: none;
