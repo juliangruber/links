@@ -26,8 +26,9 @@ function fork() {
   .post('/fork')
   .end(function(err, res) {
     if (err) {
-      qeue.fork = true;
+      queue.fork = true;
       hideIndicator();
+      offline();
       return;
     }
 
@@ -58,7 +59,10 @@ var _save = debounce(function(done) {
   .send({ token: token })
   .send({ content: textarea.value })
   .end(function(err, res) {
-    if (err) queue.save = true;
+    if (err) {
+      queue.save = true;
+      offline();
+    }
     hideIndicator();
     done();
   });
@@ -89,13 +93,13 @@ window.onpopstate = function(e) {
 };
 
 /**
- * On reconnect, call queued functions.
+ * On offline, schedule trying again.
  */
 
-function connect() {
-  if (queue.fork) fork();
-  else if (queue.save) save();
-  queue = {};
+function offline() {
+  setTimeout(function() {
+    if (queue.fork) fork();
+    else if (queue.save) save();
+    queue = {};
+  }, 1000);
 }
-
-window.ononline = connect;
