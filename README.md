@@ -25,7 +25,7 @@ As long as you keep your tab open you can edit without getting a new link.
 
 ## Running
 
-You need at least node `0.11.0` to run this.
+**You need at least node `0.11.0` to run this.**
 
 For production:
 
