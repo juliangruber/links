@@ -199,40 +199,40 @@ require.relative = function(parent) {
 
   return localRequire;
 };
-require.register("component-debounce/index.js", function(exports, require, module){
-/**
- * Debounces a function by the given threshold.
- *
- * @see http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
- * @param {Function} function to wrap
- * @param {Number} timeout in ms (`100`)
- * @param {Boolean} whether to execute at the beginning (`false`)
- * @api public
- */
+require.register("juliangruber-async-debounce/index.js", function(exports, require, module){
+module.exports = debounce;
 
-module.exports = function debounce(func, threshold, execAsap){
+var slice = [].slice;
+
+function debounce(fn, interval) {
   var timeout;
-
-  return function debounced(){
-    var obj = this, args = arguments;
-
-    function delayed () {
-      if (!execAsap) {
-        func.apply(obj, args);
+  var running = false;
+  var nextArgs;
+  
+  return function() {
+    var args = slice.call(arguments);
+    args.push(function() {
+      running = false;
+      if (nextArgs) {
+        run(nextArgs);
+        nextArgs = null;
       }
+    });
+    
+    if (running) return nextArgs = args;
+    if (timeout) clearTimeout(timeout);
+    
+    timeout = setTimeout(function() {
+      run(args);
       timeout = null;
+    }, interval);
+    
+    function run(args) {
+      fn.apply(null, args);
+      running = true;
     }
-
-    if (timeout) {
-      clearTimeout(timeout);
-    } else if (execAsap) {
-      func.apply(obj, args);
-    }
-
-    timeout = setTimeout(delayed, threshold || 100);
-  };
-};
-
+  }
+}
 });
 require.register("component-emitter/index.js", function(exports, require, module){
 
@@ -1397,50 +1397,91 @@ module.exports = request;
 
 });
 require.register("links/browser.js", function(exports, require, module){
-var debounce = require('debounce');
+var debounce = require('async-debounce');
 var request = require('superagent');
 
 var textarea = document.querySelector('textarea');
 var id = location.pathname.split('/')[2];
 var token;
+var queue = {};
 
 /**
- * On initial edit, fork.
+ * On first edit, fork.
  */
 
 textarea.oninput = function() {
   textarea.oninput = null;
+  fork();
+};
 
+/**
+ * Fork the content.
+ */
+
+function fork() {
+  showIndicator();
+  
   request
   .post('/fork')
   .end(function(err, res) {
-    if (err || !res.ok) return alert(err || res.text);
+    if (err) {
+      queue.fork = true;
+      offline();
+      return;
+    }
 
     token = res.body.token;
     id = res.body.id;
-
+  
     history.pushState({}, '', '/' + id);
     textarea.oninput = save;
     save();
   });
-};
+}
 
 /**
  * Save the content.
  */
 
-var save = debounce(function() {
-  if (!textarea.value) return;
+var save = function() {
   document.title = textarea.value.split('\n')[0];
+  showIndicator();
+  _save();
+};
+
+var _save = debounce(function(done) {
+  if (!textarea.value) return done();
   
   request
   .put(location.pathname)
   .send({ token: token })
   .send({ content: textarea.value })
   .end(function(err, res) {
-    if (err || !res.ok) alert(err || res.text);
+    if (err) {
+      queue.save = true;
+      offline();
+    } else {
+      hideIndicator();
+    }
+    done();
   });
 }, 500);
+
+/**
+ * Show saving indicator.
+ */
+
+function showIndicator() {
+  if ('*' != document.title[0]) document.title = '*' + document.title;
+}
+
+/**
+ * Hide saving indicator.
+ */
+
+function hideIndicator() {
+  if ('*' == document.title[0]) document.title = document.title.slice(1);
+}
 
 /**
  * On pop state, reload.
@@ -1450,6 +1491,18 @@ window.onpopstate = function(e) {
   if (e.state) location = location;  
 };
 
+/**
+ * On offline, schedule trying again.
+ */
+
+function offline() {
+  setTimeout(function() {
+    if (queue.fork) fork();
+    else if (queue.save) save();
+    queue = {};
+  }, 1000);
+}
+
 });
 
 
@@ -1457,10 +1510,10 @@ window.onpopstate = function(e) {
 
 
 
-require.alias("component-debounce/index.js", "links/deps/debounce/index.js");
-require.alias("component-debounce/index.js", "links/deps/debounce/index.js");
-require.alias("component-debounce/index.js", "debounce/index.js");
-require.alias("component-debounce/index.js", "component-debounce/index.js");
+require.alias("juliangruber-async-debounce/index.js", "links/deps/async-debounce/index.js");
+require.alias("juliangruber-async-debounce/index.js", "links/deps/async-debounce/index.js");
+require.alias("juliangruber-async-debounce/index.js", "async-debounce/index.js");
+require.alias("juliangruber-async-debounce/index.js", "juliangruber-async-debounce/index.js");
 require.alias("visionmedia-superagent/lib/client.js", "links/deps/superagent/lib/client.js");
 require.alias("visionmedia-superagent/lib/client.js", "links/deps/superagent/index.js");
 require.alias("visionmedia-superagent/lib/client.js", "superagent/index.js");
