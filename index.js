@@ -1,3 +1,8 @@
+
+/**
+ * Module dependencies.
+ */
+
 var koa = require('koa');
 var serve = require('koa-static');
 var route = require('koa-route');
@@ -9,9 +14,6 @@ var logger = require('koa-logger');
 var uid = require('uid2');
 var parse = require('co-body');
 var wrap = require('co-level');
-var level = require('level');
-var multilevel = require('multilevel');
-var reconnect = require('reconnect-net');
 
 /**
  * Create a new links app.
@@ -19,35 +21,20 @@ var reconnect = require('reconnect-net');
  * Options:
  *
  *   - footer: Footer html
- *   - db: Database address (Default: 'db')
  *
  * @param {LevelUp} db
  * @param {Object=} opts
  * @return {Koa}
  */
 
-module.exports = function(opts) {
+module.exports = function(db, opts) {
   if (!opts) opts = {};
-
+  db = wrap(db);
+  
   /**
-   * Get database.
+   * Koa app.
    */
-
-  var dbAddr = opts.db || 'db';
-  var _db;
   
-  if (/:\d+$/.test(dbAddr)) {
-    _db = multilevel.client();
-    var segs = dbAddr.split(':');
-  
-    reconnect(function(con){
-      con.pipe(_db.createRpcStream()).pipe(con);
-    }).connect(segs[1], segs[0]);
-  } else {
-    _db = level(dbAddr);
-  }
-
-  var db = wrap(_db);
   var app = koa();
   
   app.use(logger());
@@ -98,4 +85,4 @@ module.exports = function(opts) {
   }
 
   return app;
-}
+};
