@@ -15,14 +15,16 @@
     "koa": "0.0.2",
     "koa-static": "~1.2.0",
     "koa-route": "~1.0.2",
-    "level-co": "~0.2.0",
-    "leveldown": "~0.10.2",
     "co-render": "0.0.1",
     "koa-logger": "~1.0.1",
     "jade": "~0.35.0",
     "uid2": "0.0.3",
     "co-body": "0.0.1",
-    "minimist": "0.0.5"
+    "minimist": "0.0.5",
+    "multilevel": "~5.5.0",
+    "co-level": "~1.0.1",
+    "reconnect-net": "0.0.0",
+    "level": "~0.18.0"
   },
   "devDependencies": {},
   "keywords": [

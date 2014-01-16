@@ -4,23 +4,28 @@ var route = require('koa-route');
 var get = route.get;
 var post = route.post;
 var put = route.put;
-var level = require('level-co').deferred;
-var leveldown = require('leveldown');
 var render = require('co-render');
 var logger = require('koa-logger');
 var uid = require('uid2');
 var parse = require('co-body');
+var wrap = require('co-level');
 
 /**
  * Create a new links app.
  *
+ * Options:
+ *
+ *   - footer: Footer html
+ *
+ * @param {LevelUp} db
  * @param {Object=} opts
  * @return {Koa}
  */
 
-module.exports = function(opts) {
+module.exports = function(db, opts) {
   if (!opts) opts = {};
-  var db = level('db', { db: leveldown });
+
+  db = wrap(db);
   var app = koa();
   
   app.use(logger());

@@ -48,6 +48,7 @@ $ links
 
 * `--port, -p` The port to run on
 * `--footer` Footer html to display
+* `--db` The path to the db, or `hostname:port` address to the [multilevel](https://github.com/juliangruber/multilevel) server to connect to
 
 ## TODO
 
