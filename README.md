@@ -5,7 +5,7 @@ Experimental content sharing and collaboration platform.
 * Anonymous
 * No UI elements
 
-### New: Hosted version at [pad.sh](http://pad.sh)
+### Hosted version at [pad.sh](http://pad.sh)
 
 ## Screenshots
 
@@ -52,8 +52,6 @@ $ links
 
 ## TODO
 
-* setup public instance
-* add saving indicator
 * evaluate storage mechanisms for the token
 
 ## Behind the scenes
