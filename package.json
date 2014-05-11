@@ -23,9 +23,9 @@
     "minimist": "0.0.5",
     "co-level": "~1.0.1",
     "level": "~0.18.0",
-    "multilevel-connect": "0.0.0"
+    "multilevel-connect": "0.0.0",
+    "debug": "^0.8.1"
   },
-  "devDependencies": {},
   "keywords": [
     "links",
     "urls",

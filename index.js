@@ -15,6 +15,7 @@ var uid = require('uid2');
 var parse = require('co-body');
 var wrap = require('co-level');
 var assert = require('assert');
+var debug = require('debug')('links');
 
 /**
  * Create a new links app.
@@ -52,6 +53,7 @@ module.exports = function(db, opts) {
    */
   
   function* show(id) {
+    debug('show %s', id);
     var content = '';
     if (id) content = yield db.get('content:' + id);
     this.body = yield render(__dirname + '/index.jade', {
@@ -66,6 +68,7 @@ module.exports = function(db, opts) {
    */
   
   function* fork() {
+    debug('fork');
     var token = uid(32);
     var forkId = uid(32);
     yield db.put('token:' + forkId, token);
@@ -80,6 +83,7 @@ module.exports = function(db, opts) {
    */
   
   function* update(id) {
+    debug('update %s', id);
     var body = yield parse.json(this);
     var token = yield db.get('token:' + id);
     if (token != body.token) return this.throw(403);
