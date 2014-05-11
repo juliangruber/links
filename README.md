@@ -1,5 +1,7 @@
 # links
 
+[![build status](https://secure.travis-ci.org/juliangruber/links.svg)](http://travis-ci.org/juliangruber/links)
+
 Experimental content sharing and collaboration platform.
 
 * Anonymous
