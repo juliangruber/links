@@ -6,16 +6,20 @@
 var koa = require('koa');
 var serve = require('koa-static');
 var route = require('koa-route');
+var render = require('co-render');
+var logger = require('koa-logger');
+var parse = require('co-body');
+var assert = require('assert');
+var debug = require('debug')('links');
+var Links = require('./lib/links');
+
+/**
+ * Route shortcuts.
+ */
+
 var get = route.get;
 var post = route.post;
 var put = route.put;
-var render = require('co-render');
-var logger = require('koa-logger');
-var uid = require('uid2');
-var parse = require('co-body');
-var wrap = require('co-level');
-var assert = require('assert');
-var debug = require('debug')('links');
 
 /**
  * Create a new links app.
@@ -31,9 +35,9 @@ var debug = require('debug')('links');
 
 module.exports = function(db, opts) {
   if (!opts) opts = {};
-
   assert(db, 'db required');
-  db = wrap(db);
+
+  var links = Links(db);
   
   /**
    * Koa app.
@@ -55,7 +59,7 @@ module.exports = function(db, opts) {
   function* show(id) {
     debug('show %s', id);
     var content = '';
-    if (id) content = yield db.get('content:' + id);
+    if (id) content = yield links.get(id);
     this.body = yield render(__dirname + '/index.jade', {
       id: id,
       content: content,
@@ -69,13 +73,8 @@ module.exports = function(db, opts) {
   
   function* fork() {
     debug('fork');
-    var token = uid(32);
-    var forkId = uid(32);
-    yield db.put('token:' + forkId, token);
-    this.body = {
-      token: token,
-      id: forkId
-    };
+    var fork = yield links.fork();
+    this.body = fork;
   }
   
   /**
@@ -84,12 +83,11 @@ module.exports = function(db, opts) {
   
   function* update(id) {
     debug('update %s', id);
-    var body = yield parse.json(this);
-    var token = yield db.get('token:' + id);
-    if (token != body.token) return this.throw(403);
-    yield db.put('content:' + id, body.content);
+    var update = yield parse.json(this);
+    yield links.update(id, update);
     this.body = 'ok';
   }
 
   return app;
 };
+
