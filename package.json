@@ -31,7 +31,8 @@
     "component": "^0.19.9",
     "tap": "^0.4.9",
     "supertest": "^0.12.1",
-    "memdb": "^0.2.0"
+    "memdb": "^0.2.0",
+    "co": "~3.0.6"
   },
   "keywords": [
     "links",

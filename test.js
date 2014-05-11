@@ -1,11 +1,13 @@
 var request = require('supertest');
 var test = require('tap').test;
-var links = require('./');
+var App = require('./');
+var Links = require('./lib/links');
 var MemDB = require('memdb');
+var co = require('co');
 
 test('fork', function(t){
   var db = MemDB();
-  var app = links(db);
+  var app = App(db);
 
   request(app.callback())
   .post('/fork')
@@ -25,7 +27,8 @@ test('fork', function(t){
 
 test('update', function(t){
   var db = MemDB();
-  var app = links(db);
+  var app = App(db);
+  var links = Links(db);
 
   t.test('404', function(t){
     t.plan(1);
@@ -39,13 +42,13 @@ test('update', function(t){
   t.test('403', function(t){
     t.plan(2);
 
-    request(app.callback())
-    .post('/fork')
-    .expect(200, function(err, res){
+    co(function*(){
+      return yield links.fork();
+    })(function(err, fork){
       t.error(err);
       
       request(app.callback())
-      .put('/' + res.body.id)
+      .put('/' + fork.id)
       .send({ token: 'nope' })
       .expect(403, t.error.bind(t));
     });
@@ -54,14 +57,14 @@ test('update', function(t){
   t.test('500', function(t){
     t.plan(2);
 
-    request(app.callback())
-    .post('/fork')
-    .expect(200, function(err, res){
+    co(function*(){
+      return yield links.fork();
+    })(function(err, fork){
       t.error(err);
       
       request(app.callback())
-      .put('/' + res.body.id)
-      .send({ token: res.body.token })
+      .put('/' + fork.id)
+      .send({ token: fork.token })
       .expect(500, t.error.bind(t));
     });
   });
@@ -69,14 +72,14 @@ test('update', function(t){
   t.test('200', function(t){
     t.plan(2);
 
-    request(app.callback())
-    .post('/fork')
-    .expect(200, function(err, res){
+    co(function*(){
+      return yield links.fork();
+    })(function(err, fork){
       t.error(err);
       
       request(app.callback())
-      .put('/' + res.body.id)
-      .send({ token: res.body.token })
+      .put('/' + fork.id)
+      .send({ token: fork.token })
       .send({ content: 'content' })
       .expect(200)
       .expect('ok', t.error.bind(t));
@@ -86,27 +89,25 @@ test('update', function(t){
 
 test('show', function(t){
   var db = MemDB();
-  var app = links(db);
+  var app = App(db);
+  var links = Links(db);
 
   t.test('200', function(t){
-    t.plan(3);
+    t.plan(2);
 
-    request(app.callback())
-    .post('/fork')
-    .expect(200, function(err, res){
-      t.error(err);
-      
-      request(app.callback())
-      .put('/' + res.body.id)
-      .send({ token: res.body.token })
-      .send({ content: 'content' })
-      .expect(200, function(err){
-        t.error(err);
-
-        request(app.callback())
-        .get('/' + res.body.id)
-        .expect(200, t.error.bind(t));
+    co(function*(){
+      var fork = yield links.fork();
+      yield links.update(fork.id, {
+        token: fork.token,
+        content: 'content'
       });
+      return fork;
+    })(function(err, fork){
+      t.error(err);
+
+      request(app.callback())
+      .get('/' + fork.id)
+      .expect(200, t.error.bind(t));
     });
   });
 
