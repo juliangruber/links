@@ -41,7 +41,7 @@ module.exports = function(db, opts) {
   
   var app = koa();
   
-  app.use(logger());
+  if (process.env.NODE_ENV != 'test') app.use(logger());
   app.use(serve(__dirname + '/public'));
   
   app.use(get(/^\/([A-z0-9]{32})?$/, show));
