@@ -14,6 +14,7 @@ var logger = require('koa-logger');
 var uid = require('uid2');
 var parse = require('co-body');
 var wrap = require('co-level');
+var assert = require('assert');
 
 /**
  * Create a new links app.
@@ -29,6 +30,8 @@ var wrap = require('co-level');
 
 module.exports = function(db, opts) {
   if (!opts) opts = {};
+
+  assert(db, 'db required');
   db = wrap(db);
   
   /**
