@@ -93,7 +93,7 @@ test('show', function(t){
   var links = Links(db);
 
   t.test('200', function(t){
-    t.plan(2);
+    t.plan(3);
 
     co(function*(){
       var fork = yield links.fork();
@@ -107,16 +107,76 @@ test('show', function(t){
 
       request(app.callback())
       .get('/' + fork.id)
-      .expect(200, t.error.bind(t));
+      .expect(200, function(err){
+        t.error(err);
+
+        request(app.callback())
+        .get('/' + fork.id.substr(0, 4))
+        .expect(200, t.error.bind(t));
+      });
     });
   });
 
   t.test('404', function(t){
-    t.plan(1);
+    t.plan(2);
 
     request(app.callback())
     .get('/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-    .expect(404, t.error.bind(t));
+    .expect(404, function(err){
+      t.error(err);
+
+      co(function*(){
+        var fork = yield links.fork();
+        yield links.update(fork.id, {
+          token: fork.token,
+          content: 'content'
+        });
+        return fork;
+      })(function(err, fork){
+        t.error(err);
+
+        request(app.callback())
+        .get('/' + fork.id.substr(0, 3))
+        .expect(404, t.error.bind(t));
+      });
+    });
+  });
+});
+
+test('links#show(id)', function(t){
+  var db = MemDB();
+  var links = Links(db);
+
+  co(function*(){
+    var forks = yield [links.fork(), links.fork()];
+
+    yield [
+      links.update(forks[0].id, {
+        token: forks[0].token,
+        content: '0'
+      }),
+      links.update(forks[1].id, {
+        token: forks[1].token,
+        content: '1'
+      })
+    ];
+
+    var content = yield links.get(forks[0].id.substr(0, 3));
+    t.equal(content, '0');
+
+    content = yield links.get(forks[1].id.substr(0, 3));
+    t.equal(content, '1');
+
+    try {
+      yield links.get('noooooooo');
+    } catch (err) {
+      return;
+    }
+    throw new Error('did not throw');
+
+  })(function(err){
+    t.error(err);
+    t.end();
   });
 });
 

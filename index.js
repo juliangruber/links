@@ -48,9 +48,9 @@ module.exports = function(db, opts) {
   if (process.env.NODE_ENV != 'test') app.use(logger());
   app.use(serve(__dirname + '/public'));
   
-  app.use(get(/^\/([A-z0-9]{32})?$/, show));
-  app.use(put(/^\/([A-z0-9]{32})?$/, update));
   app.use(post('/fork', fork));
+  app.use(get(/^\/([A-z0-9]{4,32})?$/, show));
+  app.use(put(/^\/([A-z0-9]{4,32})?$/, update));
   
   /**
    * Show content.
