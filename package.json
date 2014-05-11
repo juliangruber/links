@@ -26,6 +26,11 @@
     "multilevel-connect": "0.0.0",
     "debug": "^0.8.1"
   },
+  "devDependencies": {
+    "tap": "^0.4.9",
+    "supertest": "^0.12.1",
+    "memdb": "^0.2.0"
+  },
   "keywords": [
     "links",
     "urls",
