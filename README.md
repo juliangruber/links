@@ -7,8 +7,6 @@ Experimental content sharing and collaboration platform.
 * Anonymous
 * No UI elements
 
-### Hosted version at [pad.sh](http://pad.sh)
-
 ## Screenshots
 
 ![empty](screenshots/empty.png)
